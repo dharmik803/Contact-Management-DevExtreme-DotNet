@@ -17,7 +17,11 @@ public partial class ContactDbContext : DbContext
 
     public virtual DbSet<Contact> Contacts { get; set; }
 
+    public virtual DbSet<RefreshTokens> RefreshTokens { get; set; }
+
     public virtual DbSet<Task> Tasks { get; set; }
+
+    public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
@@ -46,6 +50,24 @@ public partial class ContactDbContext : DbContext
                 .HasMaxLength(15)
                 .IsUnicode(false)
                 .HasColumnName("phoneNumber");
+        });
+
+        modelBuilder.Entity<RefreshTokens>(entity =>
+        {
+            entity.HasKey(e => e.Username).HasName("PK__RefreshT__F3DBC573BAEC33F8");
+
+            entity.ToTable("RefreshToken");
+
+            entity.Property(e => e.Username)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("username");
+            entity.Property(e => e.IsActive).HasColumnName("isActive");
+            entity.Property(e => e.RefreshToken).HasColumnName("refreshToken");
+            entity.Property(e => e.TokenId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("tokenId");
         });
 
         modelBuilder.Entity<Task>(entity =>
@@ -77,6 +99,29 @@ public partial class ContactDbContext : DbContext
                 .HasForeignKey(d => d.AssignedToId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Tasks__assigned___4CA06362");
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__users__3213E83F59DA578D");
+
+            entity.ToTable("users");
+
+            entity.HasIndex(e => e.Username, "UQ__users__F3DBC57231CDD028").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Password)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("password");
+            entity.Property(e => e.Role)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("role");
+            entity.Property(e => e.Username)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("username");
         });
 
         OnModelCreatingPartial(modelBuilder);
